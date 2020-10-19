@@ -1,4 +1,4 @@
-{ project ? import ./nix { }
+{ project ? import ./nix { system = builtins.currentSystem; }
 }:
 
 project.pkgs.mkShell {

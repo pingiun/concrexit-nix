@@ -1,1 +1,1 @@
-(import ./nix { }).ci
+(import ./nix { system = builtins.currentSystem; }).ci
