@@ -1,1 +1,2 @@
-(import ./nix { system = builtins.currentSystem; }).ci
+{ system ? builtins.currentSystem }:
+(import ./nix { inherit system; }).ci
