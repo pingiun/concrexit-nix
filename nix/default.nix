@@ -4,10 +4,14 @@ let
   # default nixpkgs
   pkgs = import sources.nixpkgs { };
 
-  # gitignore.nix 
+  # gitignore.nix
   gitignoreSource = (import sources."gitignore.nix" { inherit (pkgs) lib; }).gitignoreSource;
 
   pre-commit-hooks = (import sources."pre-commit-hooks.nix");
+
+  poetry2nix = (import sources."poetry2nix" { inherit pkgs; poetry = pkgs.poetry; });
+
+  concrexit-src = sources."concrexit";
 
   src = gitignoreSource ./..;
 in
@@ -31,6 +35,18 @@ in
       };
       # generated files
       excludes = [ "^nix/sources\.nix$" ];
+    };
+    concrexit-env = poetry2nix.mkPoetryEnv {
+      projectDir = concrexit-src;
+      overrides = poetry2nix.overrides.withDefaults (_self: super: {
+        pillow = super.pillow.overridePythonAttrs (
+          old: {
+            setupPyBuildFlags = "--disable-xcb";
+            nativeBuildInputs = [ pkgs.pkgconfig ] ++ old.nativeBuildInputs;
+            buildInputs = with pkgs; [ freetype libjpeg openjpeg zlib libtiff libwebp tcl lcms2 ] ++ old.buildInputs;
+          }
+        );
+      });
     };
   };
 }

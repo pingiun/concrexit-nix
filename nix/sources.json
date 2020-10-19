@@ -1,4 +1,16 @@
 {
+    "concrexit": {
+        "branch": "master",
+        "description": "The latest Thalia Website built on Django.",
+        "homepage": "",
+        "owner": "svthalia",
+        "repo": "concrexit",
+        "rev": "ce0a10dc952c8f5345fa8dd2547cbc240dbe666e",
+        "sha256": "0w7s79bvdn913swf8yjmjfbdbg3ipw4vdix3d3cjl1mmdh3y5h12",
+        "type": "tarball",
+        "url": "https://github.com/svthalia/concrexit/archive/ce0a10dc952c8f5345fa8dd2547cbc240dbe666e.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "gitignore.nix": {
         "branch": "master",
         "description": "Nix function for filtering local git sources",
@@ -21,6 +33,18 @@
         "sha256": "0rzf3ln6gmn1dxjz2xx4bkzqhjsdpj54vssablvhq9k9d71hz0fz",
         "type": "tarball",
         "url": "https://github.com/NixOS/nixpkgs/archive/08d429920bcb2dba1d47c93e5ed30d0f92838c89.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "poetry2nix": {
+        "branch": "master",
+        "description": "Convert poetry projects to nix automagically [maintainer=@adisbladis] ",
+        "homepage": "",
+        "owner": "nix-community",
+        "repo": "poetry2nix",
+        "rev": "f0cc43e09f6adbbde8c1207d511cd124cdca28f4",
+        "sha256": "020qpwprkb52gimvmipixc7zqqmaxagxw9ddr75yf762s312byi3",
+        "type": "tarball",
+        "url": "https://github.com/nix-community/poetry2nix/archive/f0cc43e09f6adbbde8c1207d511cd124cdca28f4.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "pre-commit-hooks.nix": {
