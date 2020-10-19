@@ -10,7 +10,7 @@ jobs:
     - uses: cachix/install-nix-action@v11
     - uses: cachix/cachix-action@v6
       with:
-        name: nix-getting-started-template
+        name: svthalia
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
         # Only needed for private caches
         #authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
