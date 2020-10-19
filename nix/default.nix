@@ -12,14 +12,24 @@ let
 
   poetry2nix = (import sources."poetry2nix" { inherit pkgs; poetry = pkgs.poetry; });
 
-  concrexit-src = sources."concrexit";
+  concrexit-src = pkgs.stdenv.mkDerivation {
+    name = "concrexit-src";
+    src = sources."concrexit";
+
+    phases = [ "unpackPhase" "patchPhase" "installPhase" ];
+    patches = [ ../misc.patch ];
+    installPhase = ''
+      mkdir -p $out
+      mv * $out
+    '';
+  };
 
   src = gitignoreSource ./..;
 
   concrexit-env = poetry2nix.mkPoetryEnv {
     projectDir = concrexit-src;
     overrides = poetry2nix.overrides.withDefaults (
-      _self: super: {
+      self: super: {
         pillow = super.pillow.overridePythonAttrs (
           old: with pkgs; {
             preConfigure =
@@ -48,10 +58,12 @@ let
                   --replace '"/System/Library/Frameworks"' ""
               '';
             nativeBuildInputs = [ pkgconfig ] ++ old.nativeBuildInputs;
+            propagatedBuildInputs = [ self.olefile self.magic ];
             buildInputs = [ freetype libjpeg openjpeg zlib libtiff libwebp tcl lcms2 ] ++ old.buildInputs;
           }
         );
         uwsgi = { };
+        python-magic = super.magic;
       }
     );
   };
@@ -61,17 +73,30 @@ let
     ${concrexit-env}/bin/python ${manage-py} $@
   '';
 
+  uwsgi = pkgs.uwsgi.override { plugins = [ "python3" ]; python3 = concrexit-env; };
+
+  concrexit-static = pkgs.runCommand "concrexit-static" { } ''
+    export STATIC_ROOT=$out
+    export DJANGO_PRODUCTION=1
+    export DJANGO_SECRET=a
+
+    ${concrexit-env}/bin/python ${manage-py} collectstatic
+    ${concrexit-env}/bin/python ${manage-py} compress
+  '';
+
   concrexit-uwsgi = pkgs.writeScriptBin "concrexit-uwsgi" ''
     ${concrexit-env}/bin/python ${manage-py} migrate
 
-    ${pkgs.uwsgi}/bin/uwsgi --socket :8000 \
+    ${uwsgi}/bin/uwsgi $@ \
+      --plugins python3 \
       --socket-timeout 1800 \
       --threads 5 \
       --processes 5 \
-      --chdir ${concrexit-src}/website/ \
+      --pythonpath ${concrexit-env}/lib/python3.7/site-packages/ \
+      --chdir ${concrexit-src}/website \
       --module thaliawebsite.wsgi:application \
+      --log-master \
       --harakiri 1800 \
-      --master \
       --max-requests 5000 \
       --vacuum \
       --limit-post 0 \
@@ -79,7 +104,7 @@ let
       --thunder-lock \
       --ignore-sigpipe \
       --ignore-write-errors \
-      --disable-write-exception $@
+      --disable-write-exception
   '';
 in
 {
@@ -90,6 +115,7 @@ in
     inherit (pkgs) niv;
     inherit (pre-commit-hooks) pre-commit;
     inherit (pre-commit-hooks) nixpkgs-fmt;
+    inherit (pkgs) uwsgi;
   };
 
   # to be built by github actions
@@ -104,6 +130,6 @@ in
       # generated files
       excludes = [ "^nix/sources\.nix$" ];
     };
-    inherit concrexit-src concrexit-env concrexit-manage concrexit-uwsgi;
+    inherit concrexit-src concrexit-env concrexit-manage concrexit-uwsgi concrexit-static;
   };
 }
