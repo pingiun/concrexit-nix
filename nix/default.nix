@@ -22,6 +22,7 @@ in
   devTools = {
     inherit (pkgs) niv;
     inherit (pre-commit-hooks) pre-commit;
+    nixpkgs-fmt = pre-commit-hooks.nixpkgs-fmt;
   };
 
   # to be built by github actions
@@ -38,15 +39,18 @@ in
     };
     concrexit-env = poetry2nix.mkPoetryEnv {
       projectDir = concrexit-src;
-      overrides = poetry2nix.overrides.withDefaults (_self: super: {
-        pillow = super.pillow.overridePythonAttrs (
-          old: {
-            setupPyBuildFlags = "--disable-xcb";
-            nativeBuildInputs = [ pkgs.pkgconfig ] ++ old.nativeBuildInputs;
-            buildInputs = with pkgs; [ freetype libjpeg openjpeg zlib libtiff libwebp tcl lcms2 ] ++ old.buildInputs;
-          }
-        );
-      });
+      overrides = poetry2nix.overrides.withDefaults (
+        _self: super: {
+          pillow = super.pillow.overridePythonAttrs (
+            old: {
+              setupPyBuildFlags = "--disable-xcb";
+              nativeBuildInputs = [ pkgs.pkgconfig ] ++ old.nativeBuildInputs;
+              buildInputs = with pkgs; [ freetype libjpeg openjpeg zlib libtiff libwebp tcl lcms2 ] ++ old.buildInputs;
+            }
+          );
+          uwsgi = { };
+        }
+      );
     };
   };
 }
