@@ -68,7 +68,7 @@ let
       --socket-timeout 1800 \
       --threads 5 \
       --processes 5 \
-      --pythonpath ${concrexit-src}/website/ \
+      --chdir ${concrexit-src}/website/ \
       --module thaliawebsite.wsgi:application \
       --harakiri 1800 \
       --master \
@@ -80,7 +80,6 @@ let
       --ignore-sigpipe \
       --ignore-write-errors \
       --disable-write-exception $@
-    }
   '';
 in
 {
