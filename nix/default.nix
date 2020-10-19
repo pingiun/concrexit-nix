@@ -62,6 +62,8 @@ let
   '';
 
   concrexit-uwsgi = pkgs.writeScriptBin "concrexit-uwsgi" ''
+    ${concrexit-env}/bin/python ${manage-py} migrate
+
     uwsgi --socket :8000 \
       --socket-timeout 1800 \
       --threads 5 \
@@ -78,6 +80,7 @@ let
       --ignore-sigpipe \
       --ignore-write-errors \
       --disable-write-exception $@
+    }
   '';
 in
 {
