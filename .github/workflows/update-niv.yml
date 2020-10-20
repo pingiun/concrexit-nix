@@ -28,3 +28,4 @@ jobs:
         commit-message: "[automation] update niv dependencies"
         title: "[automation] update niv dependencies"
         branch: "automation/update-niv-dependencies"
+        labels: "automerge"
