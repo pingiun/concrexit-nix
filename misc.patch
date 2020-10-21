@@ -1,61 +1,3 @@
-diff --git a/website/activemembers/gsuite.py b/website/activemembers/gsuite.py
-index 30387cd7..7efa7080 100644
---- a/website/activemembers/gsuite.py
-+++ b/website/activemembers/gsuite.py
-@@ -5,7 +5,6 @@ from django.conf import settings
- from django.utils.translation import gettext_lazy as _, override as lang_override
- 
- from googleapiclient.errors import HttpError
--from utils.google_api import get_directory_api
- 
- from members.models import Member
- 
-@@ -13,9 +12,13 @@ logger = logging.getLogger(__name__)
- 
- 
- class GSuiteUserService:
--    def __init__(self, directory_api=get_directory_api()):
-+    def __init__(self):
-         super().__init__()
--        self.directory_api = directory_api
-+
-+    @property
-+    def directory_api(self):
-+        from utils.google_api import get_directory_api
-+        return get_directory_api()
- 
-     def create_user(self, member: Member):
-         """
-diff --git a/website/mailinglists/gsuite.py b/website/mailinglists/gsuite.py
-index 22dbc667..95935ebc 100644
---- a/website/mailinglists/gsuite.py
-+++ b/website/mailinglists/gsuite.py
-@@ -36,14 +36,18 @@ class GSuiteSyncService:
-                 return self.__dict__ == other.__dict__
-             return False
- 
--    def __init__(
--        self,
--        groups_settings_api=get_groups_settings_api(),
--        directory_api=get_directory_api(),
--    ):
-+    def __init__(self):
-         super().__init__()
--        self.groups_settings_api = groups_settings_api
--        self.directory_api = directory_api
-+
-+    @property
-+    def directory_api(self):
-+        from utils.google_api import get_directory_api
-+        return get_directory_api()
-+
-+    @property
-+    def groups_settings_api(self):
-+        from utils.google_api import get_groups_settings_api
-+        return get_groups_settings_api()
- 
-     @staticmethod
-     def _group_settings(moderated):
 diff --git a/website/thaliawebsite/settings/production.py b/website/thaliawebsite/settings/production.py
 index e113adb8..0dd14208 100644
 --- a/website/thaliawebsite/settings/production.py
@@ -74,38 +16,10 @@ index e113adb8..0dd14208 100644
  }
 @@ -58,7 +58,7 @@ SENDFILE_URL = "/media/sendfile/"
  SENDFILE_ROOT = "/concrexit/media/"
- 
+
  STATIC_URL = "/static/"
 -STATIC_ROOT = "/concrexit/static"
 +STATIC_ROOT = os.environ.get("STATIC_ROOT", "/concrexit/static")
- 
+
  if not DEBUG:
      COMPRESS_OFFLINE = True
-@@ -129,24 +129,18 @@ LOGGING = {
-     },
-     "handlers": {
-         "console": {
--            "level": "WARNING",
--            "class": "logging.StreamHandler",
--            "formatter": "verbose",
--        },
--        "logfile": {
-             "level": "INFO",
--            "class": "logging.FileHandler",
-+            "class": "logging.StreamHandler",
-             "formatter": "verbose",
--            "filename": "/concrexit/log/django.log",
-         },
-     },
-     "loggers": {
-         "django": {
--            "handlers": ["console", "logfile"],
-+            "handlers": ["console", ],
-             "level": "INFO",
-             "propagate": False,
-         },
--        "": {"handlers": ["logfile"], "level": "INFO",},
-+        "": {"handlers": ["console"], "level": "INFO",},
-     },
- }
- 

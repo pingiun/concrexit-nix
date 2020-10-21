@@ -70,7 +70,12 @@ let
 
   manage-py = "${concrexit-src}/website/manage.py";
   concrexit-manage = pkgs.writeScriptBin "concrexit-manage" ''
+    set -e
+    test -f /run/concrexit.env && source /run/concrexit.env
     ${concrexit-env}/bin/python ${manage-py} $@
+  '';
+  sudo-concrexit-manage = pkgs.writeScriptBin "concrexit-manage" ''
+    sudo -u concrexit ${concrexit-manage}/bin/concrexit-manage $@
   '';
 
   uwsgi = pkgs.uwsgi.override { plugins = [ "python3" ]; python3 = concrexit-env; };
@@ -130,6 +135,6 @@ in
       # generated files
       excludes = [ "^nix/sources\.nix$" ];
     };
-    inherit concrexit-src concrexit-env concrexit-manage concrexit-uwsgi concrexit-static;
+    inherit concrexit-src concrexit-env concrexit-manage sudo-concrexit-manage concrexit-uwsgi concrexit-static;
   };
 }
