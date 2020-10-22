@@ -14,10 +14,10 @@ let
 
   concrexit-src = pkgs.stdenv.mkDerivation {
     name = "concrexit-src";
-    src = /Users/jelle/src/concrexit; #sources."concrexit";
+    src = sources."concrexit";
 
     phases = [ "unpackPhase" "patchPhase" "installPhase" ];
-    # patches = [ ../misc.patch ];
+    patches = [ ../misc.patch ];
     installPhase = ''
       mkdir -p $out
       mv * $out
