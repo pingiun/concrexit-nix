@@ -111,6 +111,36 @@ let
       --ignore-write-errors \
       --disable-write-exception
   '';
+
+  vm = (import "${sources.nixpkgs}/nixos" {
+    configuration = {
+      imports = [ ./configuration.nix ];
+
+      networking.hostName = "concrexit";
+
+      users = {
+        mutableUsers = false;
+
+        users.root.password = "";
+      };
+
+      virtualisation = {
+        cores = 2;
+
+        memorySize = "4096";
+      };
+    };
+    system = "x86_64-linux";
+  }).vm;
+
+  machine = (import "${sources.nixpkgs}/nixos" {
+    configuration = {
+      imports = [ ./configuration.nix ./hardware.nix ];
+
+      networking.hostName = "concrexit";
+    };
+    system = "x86_64-linux";
+  }).system;
 in
 {
   inherit pkgs src;
@@ -135,6 +165,6 @@ in
       # generated files
       excludes = [ "^nix/sources\.nix$" ];
     };
-    inherit concrexit-src concrexit-env concrexit-manage sudo-concrexit-manage concrexit-uwsgi concrexit-static;
+    inherit concrexit-src concrexit-env concrexit-manage sudo-concrexit-manage concrexit-uwsgi concrexit-static vm machine;
   };
 }
