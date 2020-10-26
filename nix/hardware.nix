@@ -1,10 +1,6 @@
-{ sources ? import ./sources.nix, ... }:
-let
-  pkgs = import sources.nixpkgs { };
-in
-{
-  imports = [ "${pkgs}/nixos/modules/profiles/qemu-guest.nix" ];
+{ ... }:
 
+{
   nixpkgs.system = "x86_64-linux";
 
   boot = {

@@ -2,7 +2,7 @@
 let
   vars = import ./vars.nix;
 
-  concrexit = import ../default.nix { system = config.nixpkgs.localSystem.system; };
+  concrexit = import ./concrexit.nix { system = config.nixpkgs.localSystem.system; };
 
 in
 {
