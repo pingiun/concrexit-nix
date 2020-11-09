@@ -37,7 +37,7 @@ let
 
   machine = (import "${sources.nixpkgs}/nixos" {
     configuration = {
-      imports = [ ./configuration.nix ./hardware.nix "${sources.nixpkgs}/nixos/modules/profiles/qemu-guest.nix" ];
+      imports = [ ./configuration.nix "${sources.nixpkgs}/nixos/modules/virtualisation/amazon-image.nix" ];
 
       networking.hostName = "concrexit";
     };
@@ -53,7 +53,10 @@ in
     inherit (pre-commit-hooks) pre-commit;
     inherit (pre-commit-hooks) nixpkgs-fmt;
     inherit (pkgs) uwsgi;
+    inherit concrexit-env;
   };
+
+  ec2tools = [ pkgs.ec2_api_tools ];
 
   # to be built by github actions
   ci = {

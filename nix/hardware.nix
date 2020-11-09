@@ -28,7 +28,7 @@
     };
   };
 
-  fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
+  fileSystems."/" = { device = "/dev/xvda"; fsType = "ext4"; };
 
-  swapDevices = [{ device = "/dev/sda2"; }];
+  # swapDevices = [{ device = "/dev/sda2"; }];
 }

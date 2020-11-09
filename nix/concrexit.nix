@@ -7,17 +7,7 @@ let
 
   poetry2nix = (import sources."poetry2nix" { inherit pkgs; poetry = pkgs.poetry; });
 
-  concrexit-src = pkgs.stdenv.mkDerivation {
-    name = "concrexit-src";
-    src = sources."concrexit";
-
-    phases = [ "unpackPhase" "patchPhase" "installPhase" ];
-    patches = [ ../misc.patch ];
-    installPhase = ''
-      mkdir -p $out
-      mv * $out
-    '';
-  };
+  concrexit-src = sources.concrexit;
 
   concrexit-env = poetry2nix.mkPoetryEnv {
     projectDir = concrexit-src;
