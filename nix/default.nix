@@ -53,7 +53,7 @@ in
     inherit (pre-commit-hooks) pre-commit;
     inherit (pre-commit-hooks) nixpkgs-fmt;
     inherit (pkgs) uwsgi;
-    inherit concrexit-env;
+    inherit (concrexit) concrexit-env;
   };
 
   ec2tools = [ pkgs.ec2_api_tools ];
