@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, _pkgs, ... }:
 let
   vars = import ./vars.nix;
 
@@ -77,51 +77,6 @@ in
           export MEDIA_ROOT=/var/lib/concrexit/media
           export STATIC_ROOT=${concrexit.concrexit-static}
           ${concrexit.concrexit-uwsgi}/bin/concrexit-uwsgi --socket :${toString vars.concrexit-port}
-        '';
-      };
-
-      "acme-staging-nix.thalia.nu".after = [ "set-route53-dns.service" ];
-
-      set-route53-dns = {
-        after = [ "networking.target" ];
-        wantedBy = [ "multi-user.target" ];
-
-        serviceConfig = {
-          Type = "oneshot";
-          DynamicUser = true;
-          PrivateUsers = true;
-        };
-
-        script = ''
-          set -x
-          ZONE_ID="Z20YH0HYTRRRNK"
-          TTL=300
-          SELF_META_URL="http://169.254.169.254/latest/meta-data"
-          PUBLIC_DNS=$(${pkgs.curl}/bin/curl $SELF_META_URL/public-hostname 2>/dev/null)
-
-          cat << EOT > /tmp/aws_r53_batch.json
-          {
-            "Comment": "Assign AWS Public DNS as a CNAME",
-            "Changes": [
-              {
-                "Action": "UPSERT",
-                "ResourceRecordSet": {
-                  "Name": "staging-nix",
-                  "Type": "CNAME",
-                  "TTL": $TTL,
-                  "ResourceRecords": [
-                    {
-                      "Value": "$PUBLIC_DNS"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-          EOT
-
-          ${pkgs.awscli}/bin/aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch file:///tmp/aws_r53_batch.json
-          rm -f /tmp/aws_r53_batch.json
         '';
       };
     };
