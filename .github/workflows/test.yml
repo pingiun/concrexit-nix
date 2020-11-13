@@ -21,7 +21,7 @@ jobs:
       run: |
         echo "${{ secrets.DEPLOY_SSH_KEY }}" > ./deploykey
         chmod 600 ./deploykey
-        echo "staging-nix.thalia.nu,46.51.153.44,2a05:d018:436:bd00:f77b:b882:4b52:f4fd ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC9wREr8e4OHw9Jtg4FjCBWDa3svY3BwRgOfpkNgPjkd" > ./known_hosts
+        echo "staging-nix.thalia.nu ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC9wREr8e4OHw9Jtg4FjCBWDa3svY3BwRgOfpkNgPjkd" > ./known_hosts
         mkdir --mode 700 ~/.ssh
         echo "IdentityFile $(pwd)/deploykey" >> ~/.ssh/config
         echo "UserKnownHostsFile $(pwd)/known_hosts" >> ~/.ssh/config
